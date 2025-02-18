@@ -243,7 +243,7 @@ GET /actuator/info      # Application info
 - **Git**: Version control
 - **Docker**: Containerization
 - **Docker Compose**: Multi-container orchestration
-
+- 
 ## Minimum Requirements
 - Java 17 or higher
 - Maven 3.8+

@@ -14,9 +14,6 @@ public class UserDTO {
     private Long userId;
     private String userName;
     private String email;
-    private String firstName ;
-    private String lastName ;
-    private String phoneNumber ;
     private boolean accountNonLocked;
     private boolean accountNonExpired;
     private boolean credentialsNonExpired;

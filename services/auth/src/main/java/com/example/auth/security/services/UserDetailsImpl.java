@@ -3,6 +3,7 @@ package com.example.auth.security.services;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.example.auth.entity.User;
 import lombok.Data;
@@ -19,50 +20,36 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+
     private String username;
+
     private String email;
-    private String firstname;
-    private String lastname;
-    private String phonenumber; // Lombok will automatically generate the getter for this
 
     @JsonIgnore
     private String password;
 
-    private boolean is2faEnabled;
-
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username,
-                           String firstname,
-                           String lastname,
-                           String phonenumber, String email,
-                           String password,
-                           boolean is2faEnabled, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Long id, String username, String email, String password,
+                           Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.phonenumber = phonenumber;
         this.password = password;
-        this.is2faEnabled = is2faEnabled;
         this.authorities = authorities;
     }
 
     public static UserDetailsImpl build(User user) {
-        GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getRoleName().name());
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+            .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+            .collect(Collectors.toList());
 
         return new UserDetailsImpl(
             user.getUserId(),
             user.getUserName(),
-            user.getFirstName(),
-            user.getLastName(),
-            user.getPhoneNumber(),
             user.getEmail(),
             user.getPassword(),
-            user.isTwoFactorEnabled(),
-            List.of(authority)
-        );
+            authorities);
     }
 
     @Override
@@ -70,6 +57,13 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 
     @Override
     public String getPassword() {
@@ -101,10 +95,6 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-    public boolean is2faEnabled() {
-        return is2faEnabled;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -115,8 +105,4 @@ public class UserDetailsImpl implements UserDetails {
         return Objects.equals(id, user.id);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

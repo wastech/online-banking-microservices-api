@@ -1,0 +1,23 @@
+eureka:
+  client:
+    register-with-eureka: false
+server:
+  port: 8222
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: auth-service
+          uri: lb:http://AUTH-SERVICE
+          predicates:
+            - Path=/api/v1/auth/**
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

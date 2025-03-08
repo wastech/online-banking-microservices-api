@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth
+    username: postgres
+    password: admin@123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      database: postgresql
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  app:
+    jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
+    jwtExpirationMs: 3000000
+    jwtCookieName: springBootEcom
+
+  ecom:
+    app:
+      jwtCookieName: springBootEcom
+
+  springfox:
+    documentation:
+      swagger-ui:
+        enabled: true
+
+server:
+  port: 10070

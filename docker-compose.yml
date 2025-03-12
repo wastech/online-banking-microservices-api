@@ -14,6 +14,23 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.2
+    container_name: keycloak-ms
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgresql:5432/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=admin@123
+    command:
+      - start-dev
+    ports:
+      - "9098:8080"
+    networks:
+      - microservices-net
+
   pgadmin:
     container_name: ms_pgadmin
     image: dpage/pgadmin4
@@ -72,6 +89,7 @@ services:
       - "22181:2181"
     networks:
       - microservices-net
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: ms_kafka

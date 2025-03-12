@@ -5,7 +5,7 @@ server:
   port: 8222
 spring:
   application:
-    name: gateway
+    name: gateway-service
   cloud:
     gateway:
       discovery:

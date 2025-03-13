@@ -1,11 +1,6 @@
-eureka:
-  client:
-    register-with-eureka: false
 server:
   port: 8222
 spring:
-  application:
-    name: gateway-service
   cloud:
     gateway:
       discovery:
@@ -21,3 +16,14 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9098/realms/micro-services
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG

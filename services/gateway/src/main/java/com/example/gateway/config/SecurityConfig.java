@@ -1,5 +1,7 @@
-package config;
+package com.example.gateway.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,16 +14,19 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity) {
+        logger.info("SecurityConfig is being applied...");
         serverHttpSecurity
-//            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+           .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchange ->
                 exchange.pathMatchers("/eureka/**")
                     .permitAll()
                     .anyExchange()
                     .authenticated())
-            .oauth2ResourceServer(spec -> spec.jwt(Customizer.withDefaults()));
+          .oauth2ResourceServer(spec -> spec.jwt(Customizer.withDefaults()));
         return serverHttpSecurity.build();
     }
 }

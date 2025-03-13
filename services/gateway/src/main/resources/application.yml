@@ -1,30 +1,5 @@
-server:
-  port: 8222
 spring:
+  config:
+    import: optional:configserver:http://localhost:8888
   application:
     name: gateway-service
-  config:
-    import: configserver:http://localhost:8888
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9098/realms/micro-services
-#          jwk-set-uri: http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/certs
-#      client:
-#        registration:
-#          gateway-client:
-#            provider: keycloak
-#            client-id: gateway-client
-#            client-secret: your-client-secret
-#            authorization-grant-type: authorization_code
-#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-#            scope: openid, profile, email
-#        provider:
-#          keycloak:
-#            issuer-uri: http://localhost:8080/auth/realms/your-realm
-#            authorization-uri: http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/auth
-#            token-uri: http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/token
-#            user-info-uri: http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/userinfo
-#            jwk-set-uri: http://localhost:8080/auth/realms/your-realm/protocol/openid-connect/certs
-#            user-name-attribute: preferred_username

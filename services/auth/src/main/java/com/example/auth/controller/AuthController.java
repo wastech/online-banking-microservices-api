@@ -152,6 +152,28 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User not found"));
+        }
+
+        User user = userOptional.get();
+        List<String> roles = user.getRoles().stream()
+            .map(role -> role.getRoleName().name())
+            .collect(Collectors.toList());
+
+        UserInfoResponse response = new UserInfoResponse(
+            user.getUserId(),
+            user.getUserName(),
+            roles
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @PostMapping("/signout")
     public ResponseEntity<?> signoutUser(){
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();

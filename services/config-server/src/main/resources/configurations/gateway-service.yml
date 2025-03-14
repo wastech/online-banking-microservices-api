@@ -11,7 +11,10 @@ spring:
           uri: lb:http://AUTH-SERVICE
           predicates:
             - Path=/api/v1/auth/**
-
+        - id: account-service
+          uri: lb:http://ACCOUNT-SERVICE
+          predicates:
+            - Path=/api/v1/accounts/**
 management:
   tracing:
     sampling:

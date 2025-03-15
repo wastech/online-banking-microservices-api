@@ -23,10 +23,14 @@ public class AccountService {
     @Autowired
     private  AccountRepository accountRepository;
 
-//    private final AuthClient authClient;
+   private final AuthClient authClient;
 
     @Transactional
     public AccountResponseDto createAccount(AccountRequestDto requestDto) {
+        // Check if the user exists in the auth database
+        var customer = authClient.findCustomerById(requestDto.getUserId())
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + requestDto.getUserId()));
+
         // Check if user already has an account
         boolean userExists = accountRepository.existsByUserId(requestDto.getUserId());
         if (userExists) {

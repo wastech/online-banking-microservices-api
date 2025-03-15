@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -53,5 +55,9 @@ public class AccountController {
     @PutMapping("/{id}/deactivate")
     public ResponseEntity<AccountResponseDto> deactivateAccount(@PathVariable Long id) {
         return ResponseEntity.ok(accountService.deactivateAccount(id));
+    }
+    @PutMapping("/{id}/balance")
+    public ResponseEntity<AccountResponseDto> updateBalance(@PathVariable Long id, @RequestBody BigDecimal newBalance) {
+        return ResponseEntity.ok(accountService.updateBalance(id, newBalance));
     }
 }

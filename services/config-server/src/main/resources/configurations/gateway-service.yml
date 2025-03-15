@@ -15,6 +15,10 @@ spring:
           uri: lb:http://ACCOUNT-SERVICE
           predicates:
             - Path=/api/v1/accounts/**
+        - id: transaction-service
+          uri: lb:http://TRANSACTION-SERVICE
+          predicates:
+            - Path=/api/v1/transactions/**
 management:
   tracing:
     sampling:

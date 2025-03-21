@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/loans")
+@RequestMapping("/api/v1/loans")
 public class LoanController {
 
     @Autowired

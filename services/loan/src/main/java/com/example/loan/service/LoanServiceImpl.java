@@ -6,6 +6,7 @@ import com.example.loan.dto.LoanRequestDto;
 import com.example.loan.dto.LoanResponseDto;
 import com.example.loan.dto.PaymentRequestDto;
 import com.example.loan.exception.LoanServiceException;
+import com.example.loan.exception.ResourceNotFoundException;
 import com.example.loan.model.Loan;
 import com.example.loan.repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +25,20 @@ public class LoanServiceImpl implements LoanService {
     private LoanRepository loanRepository;
 
     @Autowired
-    private AuthClient authClient;
+    private  AuthClient authClient;
 
     @Autowired
-    private AccountClient accountClient;
+    private  AccountClient accountClient;
 
     @Override
     public LoanResponseDto applyForLoan(LoanRequestDto loanRequestDto) {
         // Check if customer exists
         authClient.findCustomerById(loanRequestDto.getAuthId())
-            .orElseThrow(() -> new LoanServiceException("Customer not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         // Check if account exists
         accountClient.findAccountById(loanRequestDto.getAccountId())
-            .orElseThrow(() -> new LoanServiceException("Account not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         // Create new loan
         Loan loan = new Loan();

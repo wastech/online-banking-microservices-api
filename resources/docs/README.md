@@ -253,3 +253,9 @@ GET /actuator/info      # Application info
 ## Configuration Management
 Each service should have its own `application.yml` containing service-specific configurations and a `bootstrap.yml` for Spring Cloud Config settings.
 
+
+## (Todo) 
+- Transaction Notification
+- Loan Notification
+- payment Notication
+- setting up the email template

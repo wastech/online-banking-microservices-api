@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/services/discovery/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/loan/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/notification/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/transaction/src/main/java" charset="UTF-8" />
   </component>
 </project>

@@ -15,84 +15,110 @@ public class KafkaConsumerService {
 
     private final EmailService emailService;
 
-    @KafkaListener(topics = "transaction-events", groupId = "notification-group")
+    @KafkaListener(
+        topics = "transaction-events",
+        groupId = "notification-group",
+        properties = {
+            "spring.json.value.default.type=com.example.notification.event.TransactionEvent"
+        }
+    )
     public void consumeTransactionEvent(TransactionEvent event) {
-        log.info("Received Transaction Event: {}", event);
+        try {
+            log.info("Received Transaction Event: {}", event);
 
-        String subject = "Transaction Notification";
-        String content = String.format("""
-            <html>
-                <body>
-                    <h2>Transaction Alert</h2>
-                    <p>Dear Customer,</p>
-                    <p>Your transaction with reference %s has been processed.</p>
-                    <p><strong>Amount:</strong> %s</p>
-                    <p><strong>Type:</strong> %s</p>
-                    <p><strong>Status:</strong> %s</p>
-                    <p>Thank you for banking with us.</p>
-                </body>
-            </html>
-            """,
-            event.getTransactionReference(),
-            event.getAmount(),
-            event.getType(),
-            event.getStatus());
+            if (event.getEmail() == null || event.getEmail().isEmpty()) {
+                log.warn("No email address provided in event: {}", event);
+                return;
+            }
 
-        emailService.sendEmail(event.getEmail(), subject, content);
+            String subject = "Transaction Notification";
+            String content = String.format("""
+                <html>
+                    <body>
+                        <h2>Transaction Alert</h2>
+                        <p>Dear Customer,</p>
+                        <p>Your transaction with reference %s has been processed.</p>
+                        <p><strong>Amount:</strong> %s</p>
+                        <p><strong>Type:</strong> %s</p>
+                        <p><strong>Status:</strong> %s</p>
+                        <p>Thank you for banking with us.</p>
+                    </body>
+                </html>
+                """,
+                event.getTransactionReference(),
+                event.getAmount(),
+                event.getType(),
+                event.getStatus());
+
+            log.info("event.getEmail(): {}, subject: {}, content: {}", event.getEmail(), subject, content);//            emailService.sendEmail(event.getEmail(), subject, content);
+
+        } catch (Exception e) {
+            log.error("Error processing transaction event: {}", event, e);
+        }
     }
 
-    @KafkaListener(topics = "account-events", groupId = "notification-group")
-    public void consumeAccountEvent(AccountEvent event) {
-        log.info("Received Account Event: {}", event);
 
-        String subject = "Account " + event.getEventType() + " Notification";
-        String content = String.format("""
-            <html>
-                <body>
-                    <h2>Account %s Notification</h2>
-                    <p>Dear Customer,</p>
-                    <p>Your account %s has been %s.</p>
-                    <p><strong>Account Number:</strong> %s</p>
-                    <p><strong>Account Type:</strong> %s</p>
-                    <p><strong>Current Balance:</strong> %s</p>
-                    <p>Thank you for banking with us.</p>
-                </body>
-            </html>
-            """,
-            event.getEventType(),
-            event.getAccountNumber(),
-            event.getEventType().toLowerCase(),
-            event.getAccountNumber(),
-            event.getAccountType(),
-            event.getBalance());
 
-        emailService.sendEmail(event.getEmail(), subject, content);
+
+        @KafkaListener(
+            topics = "account-events",
+            groupId = "notification-group",
+            containerFactory = "kafkaListenerContainerFactory"
+        )
+        public void consumeAccountEvent(AccountEvent event) {
+            try {
+                log.info("Received Account Event: {}", event);
+
+                if (event.getEmail() == null) {
+                    log.error("No email in account event: {}", event);
+                    return;
+                }
+
+                String subject = "Account Notification";
+                String content = String.format("""
+                Account %s: %s
+                Balance: %s %s
+                Created: %s""",
+                    event.getAccountNumber(),
+                    event.getEventType(),
+                    event.getBalance(),
+                    event.getCurrency(),
+                    event.getCreatedAt());
+
+                emailService.sendEmail(event.getEmail(), subject, content);
+
+            } catch (Exception e) {
+                log.error("Failed to process account event", e);
+                throw e;
+            }
+        }
+
+
+//
+//    @KafkaListener(topics = "loan-events", groupId = "notification-group")
+//    public void consumeLoanEvent(LoanEvent event) {
+//        log.info("Received Loan Event: {}", event);
+//
+//        String subject = "Loan " + event.getEventType() + " Notification";
+//        String content = String.format("""
+//            <html>
+//                <body>
+//                    <h2>Loan %s Notification</h2>
+//                    <p>Dear Customer,</p>
+//                    <p>Your loan application has been %s.</p>
+//                    <p><strong>Loan Amount:</strong> %s</p>
+//                    <p><strong>Tenure:</strong> %s months</p>
+//                    <p><strong>Current Balance:</strong> %s</p>
+//                    <p>Thank you for banking with us.</p>
+//                </body>
+//            </html>
+//            """,
+//            event.getEventType(),
+//            event.getEventType().toLowerCase(),
+//            event.getAmount(),
+//            event.getTenureMonths(),
+//            event.getBalance());
+//
+//        emailService.sendEmail(event.getEmail(), subject, content);
+//    }
     }
-
-    @KafkaListener(topics = "loan-events", groupId = "notification-group")
-    public void consumeLoanEvent(LoanEvent event) {
-        log.info("Received Loan Event: {}", event);
-
-        String subject = "Loan " + event.getEventType() + " Notification";
-        String content = String.format("""
-            <html>
-                <body>
-                    <h2>Loan %s Notification</h2>
-                    <p>Dear Customer,</p>
-                    <p>Your loan application has been %s.</p>
-                    <p><strong>Loan Amount:</strong> %s</p>
-                    <p><strong>Tenure:</strong> %s months</p>
-                    <p><strong>Current Balance:</strong> %s</p>
-                    <p>Thank you for banking with us.</p>
-                </body>
-            </html>
-            """,
-            event.getEventType(),
-            event.getEventType().toLowerCase(),
-            event.getAmount(),
-            event.getTenureMonths(),
-            event.getBalance());
-
-        emailService.sendEmail(event.getEmail(), subject, content);
-    }
-}

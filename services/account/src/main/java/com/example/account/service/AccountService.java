@@ -3,10 +3,12 @@ package com.example.account.service;
 import com.example.account.auth.AuthClient;
 import com.example.account.dto.AccountRequestDto;
 import com.example.account.dto.AccountResponseDto;
+import com.example.account.event.AccountEvent;
 import com.example.account.exception.ResourceNotFoundException;
 import com.example.account.model.Account;
 import com.example.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,33 +19,34 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AccountService {
 
     @Autowired
     private  AccountRepository accountRepository;
-
+    private final AccountEventPublisher accountEventPublisher;
    private final AuthClient authClient;
+
 
     @Transactional
     public AccountResponseDto createAccount(AccountRequestDto requestDto) {
-        // Check if the user exists in the auth database
+        // 1. Check if user exists
         var customer = authClient.findCustomerById(requestDto.getUserId())
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + requestDto.getUserId()));
 
-        // Check if user already has an account
-        boolean userExists = accountRepository.existsByUserId(requestDto.getUserId());
-        if (userExists) {
+        // 2. Check if user already has an account
+        if (accountRepository.existsByUserId(requestDto.getUserId())) {
             throw new IllegalArgumentException("User already has an account.");
         }
 
-        // Generate a unique account number and ensure it doesn't already exist
+        // 3. Generate unique account number
         String accountNumber;
         do {
             accountNumber = generateAccountNumber();
         } while (accountRepository.existsByAccountNumber(accountNumber));
 
-        // Create account
+        // 4. Create and save account
         Account account = Account.builder()
             .accountNumber(accountNumber)
             .userId(requestDto.getUserId())
@@ -55,6 +58,17 @@ public class AccountService {
             .build();
 
         account = accountRepository.save(account);
+
+        // 5. Publish Kafka event via AccountEventPublisher
+        accountEventPublisher.publishAccountCreatedEvent(
+            account.getAccountNumber(),
+            account.getUserId(),
+            account.getAccountType(),
+            account.getBalance(),
+            account.getCurrency(),
+            account.getCreatedAt(),
+            customer.email()
+        );
 
         return mapToResponseDto(account);
     }

@@ -70,7 +70,7 @@ public class AuthController {
             .map(item -> item.getAuthority())
             .collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), userDetails.getEmail(),
             userDetails.getUsername(), roles, jwtCookie.toString());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
@@ -146,7 +146,7 @@ public class AuthController {
             .map(item -> item.getAuthority())
             .collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(), userDetails.getEmail(),
             userDetails.getUsername(), roles);
 
         return ResponseEntity.ok().body(response);
@@ -166,6 +166,7 @@ public class AuthController {
 
         UserInfoResponse response = new UserInfoResponse(
             user.getUserId(),
+            user.getEmail(),
             user.getUserName(),
             roles
         );

@@ -26,27 +26,37 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountClient accountClient;
+    private final TransactionEventPublisher transactionEventPublisher;
 
     @Transactional
     public TransactionResponseDto createTransaction(TransactionRequestDto requestDto) {
         var sourceAccount = accountClient.findAccountById(requestDto.getSourceAccountId())
             .orElseThrow(() -> new ResourceNotFoundException("Source account not found with id: " + requestDto.getSourceAccountId()));
 
-        // Validate transaction type
         Transaction.TransactionType type = requestDto.getType();
+        TransactionResponseDto responseDto;
 
         switch (type) {
             case DEPOSIT:
-                return handleDeposit(requestDto, sourceAccount);
+                responseDto = handleDeposit(requestDto, sourceAccount);
+                break;
             case WITHDRAWAL:
-                return handleWithdrawal(requestDto, sourceAccount);
+                responseDto = handleWithdrawal(requestDto, sourceAccount);
+                break;
             case TRANSFER:
-                return handleTransfer(requestDto, sourceAccount);
+                responseDto = handleTransfer(requestDto, sourceAccount);
+                break;
             default:
                 throw new IllegalArgumentException("Invalid transaction type: " + type);
         }
-    }
 
+        // Publish transaction event after successful transaction
+        Transaction transaction = transactionRepository.findByTransactionReference(responseDto.getTransactionReference())
+            .orElseThrow(() -> new RuntimeException("Transaction not found after creation"));
+        transactionEventPublisher.publishTransactionEvent(transaction);
+
+        return responseDto;
+    }
     private TransactionResponseDto handleDeposit(TransactionRequestDto requestDto, AccountResponse account) {
         BigDecimal newBalance = account.balance().add(requestDto.getAmount());
 

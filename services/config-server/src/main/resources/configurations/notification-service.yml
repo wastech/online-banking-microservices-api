@@ -1,3 +1,53 @@
+#server:
+#  port: 10050
+#
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/notification
+#    username: postgres
+#    password: admin@123
+#    driver-class-name: org.postgresql.Driver
+#    hikari:
+#      connection-timeout: 5000
+#      maximum-pool-size: 5
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#
+#  mail:
+#    host: mail-dev
+#    port: 1025
+#    username: admin@123
+#    password: admin@123
+#    properties:
+#      mail:
+#        smtp:
+#          starttls:
+#            enable: false
+#          auth: false
+#          connectiontimeout: 5000
+#          timeout: 3000
+#          writetimeout: 5000
+#
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    consumer:
+#      group-id: notification-group
+#      auto-offset-reset: earliest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      properties:
+#        spring.json.trusted.packages: "*"
+#        spring.json.type.mapping: transactionEvent:com.example.notification.event.TransactionEvent
+#        spring.json.value.default.type: com.example.notification.event.TransactionEvent
+
+
 server:
   port: 10050
 
@@ -10,6 +60,7 @@ spring:
     hikari:
       connection-timeout: 5000
       maximum-pool-size: 5
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -34,12 +85,21 @@ spring:
           timeout: 3000
           writetimeout: 5000
 
-kafka:
-  bootstrap-servers: localhost:9092
-  consumer:
-    group-id: notification-group
-    auto-offset-reset: earliest
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-    properties:
-      spring.json.trusted.packages: "*"
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.type.mapping: |
+          transactionEvent:com.example.notification.event.TransactionEvent,
+          accountEvent:com.example.notification.event.AccountEvent
+        spring.json.value.default.type: com.example.notification.event.AccountEvent
+
+  application:
+    topics:
+      transaction-events: transaction-events
+      account-events: account-events

@@ -1,4 +1,4 @@
-package com.example.notification.event;
+package com.example.account.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data @Builder
-@NoArgsConstructor @AllArgsConstructor
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class AccountEvent {
     private String eventType;
     private String accountNumber;

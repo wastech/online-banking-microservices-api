@@ -13,10 +13,16 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      spring.json.add.type.headers: false
 server:
   port: 10090
 
 application:
   config:
     account-url: http://localhost:8222/api/v1/accounts
+    auth-url: http://localhost:8222/api/v1/auth

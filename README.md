@@ -67,12 +67,9 @@ A modern, scalable online banking system built using a microservices architectur
 ---
 ## Running the Application
 
-```markdown
 1. **Start the Services with Docker Compose**:
    ```bash
    docker-compose up -d
-```
----
 
 2. **Verify Services:**
 - PostgreSQL: `localhost:5432`

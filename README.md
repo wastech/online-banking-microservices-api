@@ -7,7 +7,6 @@ A modern, scalable online banking system built using a microservices architectur
 
 ## Table of Contents
 - [Features](#features)
-- [Architecture](#architecture)
 - [Technologies](#technologies)
 - [Prerequisites](#prerequisites)
 - [Setup and Installation](#setup-and-installation)
@@ -62,10 +61,36 @@ A modern, scalable online banking system built using a microservices architectur
   ```bash
  mvn clean install
 ```
+3. **Configure Environment Variables:**
+     - See the Environment Variables (#environment-variables) section for details.
+     - Update the docker-compose.yml file if needed.
 ---
+## Running the Application
 
 ```markdown
+1. **Start the Services with Docker Compose**:
+   ```bash
+   docker-compose up -d
+```
+---
+
+2. **Verify Services:**
+- PostgreSQL: `localhost:5432`
+- Keycloak: `localhost:9098`
+- pgAdmin: `localhost:5050`
+- Zipkin: `localhost:9411`
+- MongoDB: `localhost:27017`
+- Mongo Express: `localhost:8081`
+- Kafka: `localhost:9092`
+- Maildev: `localhost:1080` (UI), `localhost:1025` (SMTP)
+
+3.  Stop the Services
+```bash
+docker-compose down
+
+```
 ## Services
+```markdown
 | Service            | Description                          | Port       |
 |--------------------|--------------------------------------|------------|
 | **PostgreSQL**     | Relational database for core data    | 5432       |

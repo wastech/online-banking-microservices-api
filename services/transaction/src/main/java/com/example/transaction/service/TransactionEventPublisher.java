@@ -1,11 +1,11 @@
 package com.example.transaction.service;
 
+import com.example.transaction.account.AccountClient;
 import com.example.transaction.auth.AuthClient;
 import com.example.transaction.event.TransactionEvent;
 import com.example.transaction.model.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,39 +15,43 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class TransactionEventPublisher {
-    private final KafkaTemplate<String, TransactionEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final AuthClient authClient;
+    private final AccountClient accountClient;
 
-    @KafkaListener(
-        topics = "transaction-events",
-        groupId = "notification-group",
-        containerFactory = "kafkaListenerContainerFactory"
-    )
+    // Remove the KafkaListener annotation from here - don't both produce and consume on the same topic
+    // in the same service unless you need to
+
     public void publishTransactionEvent(Transaction transaction) {
-        authClient.findCustomerById(transaction.getSourceAccountId())
-            .ifPresentOrElse(
-                user -> {
-                    log.info("Publishing TransactionEvent with email: {}", user); // Debug log
+        try {
+            var account = accountClient.findAccountById(transaction.getSourceAccountId());
+            Long userId = account.get().userId(); // Ensure AccountClient returns a valid userId
 
-                    // Use the Builder pattern (or set fields directly)
-                    TransactionEvent event = TransactionEvent.builder()
-                        .transactionReference(transaction.getTransactionReference())
-                        .sourceAccountId(transaction.getSourceAccountId())
-                        .destinationAccountId(transaction.getDestinationAccountId())
-                        .amount(transaction.getAmount())
-                        .type(transaction.getType().name())
-                        .status(transaction.getStatus().name())
-                        .description(transaction.getDescription())
-                        .userId(Long.parseLong(user.id()))
-                        .email(user.email()) // <-- Make sure this is set!
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
+            authClient.findCustomerById(userId)
+                .ifPresentOrElse(
+                    user -> {
+                        TransactionEvent event = TransactionEvent.builder()
+                            .transactionReference(transaction.getTransactionReference())
+                            .sourceAccountId(transaction.getSourceAccountId())
+                            .destinationAccountId(transaction.getDestinationAccountId())
+                            .amount(transaction.getAmount())
+                            .type(transaction.getType().name())
+                            .status(transaction.getStatus().name())
+                            .description(transaction.getDescription())
+                            .userId(userId)
+                            .email(user.email())
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .build();
 
-                    log.info("Publishing TransactionEvent with email: {}", event.getEmail()); // Debug log
-                    kafkaTemplate.send("transaction-events", event);
-                },
-                () -> log.warn("User not found for account ID: {}", transaction.getSourceAccountId())
-            );
+                        log.info("Publishing TransactionEvent with email: {}", event.getEmail());
+                        kafkaTemplate.send("transaction-events", event);
+                    },
+                    () -> log.warn("User not found for user ID: {}", userId)
+                );
+
+        } catch (Exception e) {
+            log.error("Error processing transaction event: {}", e.getMessage(), e);
+        }
     }
 }

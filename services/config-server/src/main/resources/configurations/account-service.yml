@@ -14,12 +14,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   kafka:
+#    bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: true  # Changed to true for type mapping
-        spring.json.type.mapping: accountEvent:com.example.account.event.AccountEvent
+        spring.json.add.type.headers: false
 
   mail:
     host: mail-dev
@@ -38,5 +38,5 @@ application:
   config:
     auth-url: http://localhost:8222/api/v1/auth
     kafka:
-      transaction-topic: transaction-events  # Custom topic name configuration
+      transaction-topic: transaction-events
       retry-interval-ms: 1000

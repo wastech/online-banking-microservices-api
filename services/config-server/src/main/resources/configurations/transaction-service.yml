@@ -19,6 +19,16 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     properties:
       spring.json.add.type.headers: false
+
+  mail:
+    host: mail-dev
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: false
+          auth: false
 server:
   port: 10090
 
@@ -26,3 +36,6 @@ application:
   config:
     account-url: http://localhost:8222/api/v1/accounts
     auth-url: http://localhost:8222/api/v1/auth
+    kafka:
+      transaction-topic: account-events
+      retry-interval-ms: 1000

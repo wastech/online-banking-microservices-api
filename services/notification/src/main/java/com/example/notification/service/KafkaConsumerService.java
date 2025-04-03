@@ -1,3 +1,7 @@
+// The bug is in the content format for the account event email.
+// In KafkaConsumerService.java, the email content for AccountEvent is plain text
+// but should be HTML format like the TransactionEvent
+
 package com.example.notification.service;
 
 import com.example.notification.event.AccountEvent;
@@ -48,7 +52,7 @@ public class KafkaConsumerService {
                 event.getStatus());
 
             log.info("event.getEmail(): {}, subject: {}, content: {}", event.getEmail(), subject, content);
-            emailService.sendEmail(event.getEmail(), subject, content);
+//            emailService.sendEmail(event.getEmail(), subject, content);
 
         } catch (Exception e) {
             log.error("Error processing transaction event: {}", event, e);
@@ -70,21 +74,33 @@ public class KafkaConsumerService {
             }
 
             String subject = "Account Notification";
+            // FIXED: Changed from plain text to HTML format to match expected email format
             String content = String.format("""
-            Account %s: %s
-            Balance: %s %s
-            Created: %s""",
+                <html>
+                    <body>
+                        <h2>Account Notification</h2>
+                        <p>Dear Customer,</p>
+                        <p>We're writing to inform you about your account:</p>
+                        <p><strong>Account Number:</strong> %s</p>
+                        <p><strong>Event:</strong> %s</p>
+                        <p><strong>Balance:</strong> %s %s</p>
+                        <p><strong>Created:</strong> %s</p>
+                        <p>Thank you for banking with us.</p>
+                    </body>
+                </html>
+                """,
                 event.getAccountNumber(),
                 event.getEventType(),
                 event.getBalance(),
                 event.getCurrency(),
                 event.getCreatedAt());
 
-            emailService.sendEmail(event.getEmail(), subject, content);
+//            emailService.sendEmail(event.getEmail(), subject, content);
+            log.info("event.getEmail(): {}, subject: {}, content: {}", event.getEmail(), subject, content);
 
         } catch (Exception e) {
             log.error("Failed to process account event", e);
-            throw e;
+            throw e; // Re-throwing the exception
         }
     }
 }

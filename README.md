@@ -26,7 +26,7 @@ A modern, scalable online banking system built using a microservices architectur
 - **Authentication**: Secure user authentication with JWT/OAuth2 via Keycloak.
 - **Service Discovery**: Dynamic service registration and discovery with Eureka.
 - **Distributed Tracing**: Monitor requests with Zipkin.
-- **Caching**: Improve performance with Redis.
+- **Caching**: Improve performance with EhCache .
 - **Event-Driven Communication**: Asynchronous messaging with Kafka.
 
 ---

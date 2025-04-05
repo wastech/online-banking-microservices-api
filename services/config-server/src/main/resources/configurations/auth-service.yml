@@ -10,6 +10,13 @@ spring:
       ddl-auto: update
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
 
   app:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
@@ -27,3 +34,9 @@ spring:
 
 server:
   port: 10070
+
+logging:
+  level:
+    org.springframework.cache: TRACE
+    com.example.auth: DEBUG
+    org.hibernate.SQL: DEBUG
